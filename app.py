@@ -253,6 +253,8 @@ if analyze:
 
         st.subheader("📝 Original Message")
 
+        import re
+
         toxic_words = [
             "idiot",
             "stupid",
@@ -266,11 +268,9 @@ if analyze:
             "pathetic"
         ]
 
-        import re
-
         highlighted = message
 
-       for word in toxic_words:
+        for word in toxic_words:
            highlighted = re.sub(
                rf"\b({re.escape(word)})\b",
                r"🔴 **\1**",
