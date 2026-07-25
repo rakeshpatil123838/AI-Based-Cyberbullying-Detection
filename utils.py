@@ -147,8 +147,7 @@ def analyze_text(text):
 
     toxic = toxic_model(text)[0]
 
-    print(toxic)
-    st.write(toxic)
+    st.write("Model Output:", toxic)
     
     sentiment = sentiment_model(text)[0]
 
