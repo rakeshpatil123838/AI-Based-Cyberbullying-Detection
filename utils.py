@@ -174,6 +174,9 @@ def analyze_text(text):
         keywords
     )
 
+    st.write("Prediction:", prediction)
+    st.write("Score:", score)
+
     return {
 
         "prediction": prediction,
