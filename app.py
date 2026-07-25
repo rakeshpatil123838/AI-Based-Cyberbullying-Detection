@@ -164,8 +164,6 @@ if analyze:
 
         prediction = result["prediction"]
 
-        st.write(result)
-
         confidence = result["confidence"]
 
         severity = result["severity"]
@@ -232,6 +230,8 @@ if analyze:
         # ==========================================
         # Prediction Card
         # ==========================================
+
+        st.write("Prediction before card:", prediction)
 
         if prediction.upper() == "TOXIC":
 
