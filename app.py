@@ -245,23 +245,7 @@ if analyze:
 
         st.subheader("🤖 AI Explanation")
 
-        if prediction.upper() == "TOXIC":
-
-            st.warning(f"""
-The AI model predicts that this message contains harmful or abusive language.
-
-**Severity:** {severity}
-
-**Reason**
-
-The detected text contains insulting, offensive or cyberbullying-related language that may negatively affect another person.
-""")
-
-        else:
-
-            st.success("""
-The AI model predicts that this message is respectful and does not contain harmful language.
-""")
+        st.info(result["explanation"])
 
         # ==========================================
         # Original Message
