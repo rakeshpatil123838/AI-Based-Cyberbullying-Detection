@@ -1,9 +1,9 @@
 import re
-import streamlit as st
-import pandas as pd
 import os
-
 from datetime import datetime
+
+import pandas as pd
+import streamlit as st
 from transformers import pipeline
 
 # ============================================================
@@ -29,11 +29,10 @@ def load_models():
 toxic_model, sentiment_model = load_models()
 
 # ============================================================
-# TOXIC WORD LIST
+# TOXIC WORDS
 # ============================================================
 
 TOXIC_WORDS = [
-
     "idiot",
     "stupid",
     "moron",
@@ -49,8 +48,10 @@ TOXIC_WORDS = [
     "kill",
     "die",
     "useless",
-    "disgusting"
-
+    "disgusting",
+    "bastard",
+    "shut up",
+    "nonsense"
 ]
 
 # ============================================================
@@ -59,14 +60,13 @@ TOXIC_WORDS = [
 
 def extract_keywords(text):
 
-    found = []
+    text = text.lower()
 
-    lower = text.lower()
+    found = []
 
     for word in TOXIC_WORDS:
 
-        if re.search(r"\b"+re.escape(word)+r"\b", lower):
-
+        if re.search(r"\b" + re.escape(word) + r"\b", text):
             found.append(word)
 
     return found
@@ -77,15 +77,13 @@ def extract_keywords(text):
 
 def get_severity(score):
 
-    percent = score * 100
-
-    if percent >= 90:
+    if score >= 90:
         return "Critical 🔴"
 
-    elif percent >= 75:
+    elif score >= 75:
         return "High 🟠"
 
-    elif percent >= 60:
+    elif score >= 60:
         return "Medium 🟡"
 
     else:
@@ -125,26 +123,24 @@ def get_explanation(prediction, keywords):
 
     if prediction == "TOXIC":
 
-        if len(keywords):
+        if keywords:
 
             return (
-                "The prediction is based on offensive "
-                "language detected in the message.\n\n"
-                f"Detected keywords: {', '.join(keywords)}"
+                "The AI detected abusive language.\n\n"
+                f"Detected words: {', '.join(keywords)}"
             )
 
         return (
-            "The model detected language patterns commonly "
-            "associated with insults, harassment, or abusive content."
+            "The AI detected toxic language patterns even though "
+            "no explicit offensive keywords were found."
         )
 
     return (
-        "The model did not detect patterns associated with "
-        "cyberbullying or toxic language."
+        "The AI did not detect cyberbullying or toxic language."
     )
 
 # ============================================================
-# ANALYZE
+# ANALYZE TEXT
 # ============================================================
 
 def analyze_text(text):
@@ -152,14 +148,17 @@ def analyze_text(text):
     toxic = toxic_model(text)[0]
     sentiment = sentiment_model(text)[0]
 
-    score = float(toxic["score"])      # 0 to 1
-    confidence = score * 100           # 0 to 100
+    score = float(toxic["score"]) * 100
 
     keywords = extract_keywords(text)
 
-    # Prediction logic
-    if confidence >= 60 or len(keywords) > 0:
+    # Decision Logic
+    if len(keywords) > 0:
         prediction = "TOXIC"
+
+    elif score >= 60:
+        prediction = "TOXIC"
+
     else:
         prediction = "SAFE"
 
@@ -176,7 +175,7 @@ def analyze_text(text):
 
         "prediction": prediction,
 
-        "confidence": confidence,
+        "confidence": score,
 
         "severity": severity,
 
@@ -202,23 +201,17 @@ def save_history(message, result):
 
     row = pd.DataFrame([{
 
-        "Date":
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "Date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 
-        "Message":
-        message,
+        "Message": message,
 
-        "Prediction":
-        result["prediction"],
+        "Prediction": result["prediction"],
 
-        "Confidence":
-         round(result["confidence"], 2),
+        "Confidence": round(result["confidence"], 2),
 
-        "Severity":
-        result["severity"],
+        "Severity": result["severity"],
 
-        "Sentiment":
-        result["sentiment"]
+        "Sentiment": result["sentiment"]
 
     }])
 
@@ -228,12 +221,9 @@ def save_history(message, result):
 
             old = pd.read_csv(file)
 
-            df = pd.concat(
-                [old, row],
-                ignore_index=True
-            )
+            df = pd.concat([old, row], ignore_index=True)
 
-        except:
+        except Exception:
 
             df = row
 
@@ -254,19 +244,12 @@ def load_history():
     if not os.path.exists(file):
 
         return pd.DataFrame(columns=[
-
             "Date",
-
             "Message",
-
             "Prediction",
-
             "Confidence",
-
             "Severity",
-
             "Sentiment"
-
         ])
 
     return pd.read_csv(file)
@@ -282,34 +265,19 @@ def dashboard_stats():
     if df.empty:
 
         return {
-
             "total": 0,
-
             "safe": 0,
-
             "toxic": 0,
-
             "average": 0
-
         }
 
     total = len(df)
 
-    toxic = len(
-
-        df[df["Prediction"] == "TOXIC"]
-
-    )
+    toxic = len(df[df["Prediction"] == "TOXIC"])
 
     safe = total - toxic
 
-    average = round(
-
-        df["Confidence"].mean(),
-
-        2
-
-    )
+    average = round(df["Confidence"].mean(), 2)
 
     return {
 
