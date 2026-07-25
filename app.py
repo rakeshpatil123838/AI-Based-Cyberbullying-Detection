@@ -187,7 +187,7 @@ if analyze:
 
         col2.metric(
             "Confidence",
-            f"{confidence*100:.2f}%"
+            f"{confidence:.2f}%"
         )
 
         col3.metric(
@@ -208,7 +208,7 @@ if analyze:
 
         gauge = go.Figure(go.Indicator(
             mode="gauge+number",
-            value=confidence * 100,
+            value=confidence ,
             number={"suffix": "%"},
             title={"text": "AI Confidence"},
             gauge={
@@ -282,19 +282,17 @@ The AI model predicts that this message is respectful and does not contain harmf
             "pathetic"
         ]
 
+        import re
+
         highlighted = message
 
-        for word in toxic_words:
-
-            highlighted = highlighted.replace(
-                word,
-                f"🔴 **{word}**"
-            )
-
-            highlighted = highlighted.replace(
-                word.capitalize(),
-                f"🔴 **{word.capitalize()}**"
-            )
+       for word in toxic_words:
+           highlighted = re.sub(
+               rf"\b({re.escape(word)})\b",
+               r"🔴 **\1**",
+               highlighted,
+               flags=re.IGNORECASE
+          )
 
         st.markdown(highlighted)
 
@@ -327,7 +325,7 @@ Prediction
 
 Confidence
 
-{confidence*100:.2f} %
+{confidence:.2f} %
 
 Severity
 
