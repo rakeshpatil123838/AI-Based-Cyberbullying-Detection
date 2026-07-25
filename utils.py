@@ -146,8 +146,6 @@ def get_explanation(prediction, keywords):
 def analyze_text(text):
 
     toxic = toxic_model(text)[0]
-
-    st.write("Model Output:", toxic)
     
     sentiment = sentiment_model(text)[0]
 
@@ -173,10 +171,7 @@ def analyze_text(text):
         prediction,
         keywords
     )
-
-    st.write("Prediction:", prediction)
-    st.write("Score:", score)
-
+    
     return {
 
         "prediction": prediction,
