@@ -77,20 +77,18 @@ def extract_keywords(text):
 
 def get_severity(score):
 
-    if score >= 0.95:
+    percent = score * 100
 
+    if percent >= 90:
         return "Critical 🔴"
 
-    elif score >= 0.85:
-
+    elif percent >= 75:
         return "High 🟠"
 
-    elif score >= 0.70:
-
+    elif percent >= 60:
         return "Medium 🟡"
 
     else:
-
         return "Low 🟢"
 
 # ============================================================
@@ -152,23 +150,18 @@ def get_explanation(prediction, keywords):
 def analyze_text(text):
 
     toxic = toxic_model(text)[0]
-
     sentiment = sentiment_model(text)[0]
 
-    label = toxic["label"].upper()
-
-    score = float(toxic["score"])
-
-    # Normalize prediction
-    if "TOXIC" in label:
-
-        prediction = "TOXIC"
-
-    else:
-
-        prediction = "SAFE"
+    score = float(toxic["score"])      # 0 to 1
+    confidence = score * 100           # 0 to 100
 
     keywords = extract_keywords(text)
+
+    # Prediction logic
+    if confidence >= 60 or len(keywords) > 0:
+        prediction = "TOXIC"
+    else:
+        prediction = "SAFE"
 
     severity = get_severity(score)
 
@@ -183,7 +176,7 @@ def analyze_text(text):
 
         "prediction": prediction,
 
-        "confidence": score,
+        "confidence": confidence,
 
         "severity": severity,
 
@@ -219,7 +212,7 @@ def save_history(message, result):
         result["prediction"],
 
         "Confidence":
-        round(result["confidence"] * 100, 2),
+         round(result["confidence"], 2),
 
         "Severity":
         result["severity"],
