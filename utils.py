@@ -146,6 +146,10 @@ def get_explanation(prediction, keywords):
 def analyze_text(text):
 
     toxic = toxic_model(text)[0]
+
+    print(toxic)
+    st.write(toxic)
+    
     sentiment = sentiment_model(text)[0]
 
     score = float(toxic["score"]) * 100
