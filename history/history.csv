@@ -1,0 +1,8 @@
+Date,Message,Prediction,Confidence,Severity,Sentiment
+2026-07-25 14:18:37,Have a wonderful day!,toxic,0.12,Low 🟢,POSITIVE
+2026-07-25 14:19:15,You did an excellent job on the project.,toxic,0.06,Low 🟢,POSITIVE
+2026-07-25 14:19:49,You are an idiot and nobody likes you.,toxic,98.69,Critical 🔴,NEGATIVE
+2026-07-25 14:26:25,"I don't agree with your opinion, but I respect it.",toxic,0.06,Low 🟢,POSITIVE
+2026-07-25 14:26:51,Everyone hates you. You're worthless and should disappear.,toxic,97.38,Critical 🔴,NEGATIVE
+2026-07-25 17:50:42,You did an excellent job on the project.,TOXIC,0.06,Low 🟢,POSITIVE
+2026-07-25 17:51:01,You did an excellent job on the project.,TOXIC,0.06,Low 🟢,POSITIVE
